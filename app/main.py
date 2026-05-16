@@ -1,11 +1,20 @@
 from app.schemas import SearchRequest, SearchResponse
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from app.search_engine import ProductSearchEngine
 
 app = FastAPI(
     title="AI Product Search API",
     description="Semantic product search using Sentence-BERT embeddings and cosine similarity",
     version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*'],
 )
 
 search_engine = ProductSearchEngine()
