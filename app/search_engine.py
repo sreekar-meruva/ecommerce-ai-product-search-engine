@@ -7,9 +7,13 @@ class ProductSearchEngine:
     def __init__(self,
                  product_path = "models/processed_prods.csv",
                  embeddings_path = "models/prod_embeddings.npy",
+                 category_embedding_path = "models/category_embeddings.npy",
+                 categories_path = "models/processed_categories.csv",
                  model_name = "sentence-transformers/all-MiniLM-L6-v2"):
         self.products = pd.read_csv(product_path)
+        self.categories = pd.read_csv(categories_path)
         self.prod_embeddings = np.load(embeddings_path)
+        self.category_embeddings = np.load(category_embedding_path)
         self.model = SentenceTransformer(model_name)
 
     def search(self, 
@@ -26,10 +30,20 @@ class ProductSearchEngine:
         candidates = list(range(len(self.products)))
 
         if not category_empty:
+            query_cat_embeddings = self.model.encode(
+                [category],
+                convert_to_numpy=True,
+                normalize_embeddings=True  
+            )
+            cat_embeddings = self.category_embeddings
+            cat_sim_score = cosine_similarity(query_cat_embeddings,cat_embeddings)[0]
+            sort_cat_sim_score = cat_sim_score.argsort()[::-1]
+            relevant_category = self.categories.iloc[sort_cat_sim_score[0]]["category"]
             candidates = [
                 indx for indx in candidates
-                if self.products.iloc[indx]["category"].lower() == category.lower()
+                if self.products.iloc[indx]["category"].lower() == relevant_category.lower()
             ]
+
 
         if sources:
             sources_lower = [source.lower() for source in sources]
