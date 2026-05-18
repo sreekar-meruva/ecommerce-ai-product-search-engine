@@ -8,12 +8,28 @@ async function loadCategorySection() {
         return;
     }
 
-    const response = await fetch("components/category-section.html");
-    const html = await response.text();
+    try {
+        const response = await fetch("components/category-section.html");
 
-    container.innerHTML = html;
+        if (!response.ok) {
+            throw new Error("Unable to load category component.");
+        }
 
-    initializeCategoryEvents();
+        const html = await response.text();
+
+        container.innerHTML = html;
+
+        initializeCategoryEvents();
+
+    } catch (error) {
+        console.error("Category component load error:", error);
+        container.innerHTML = `
+            <div class="status-card error-card">
+                <h4>Category section failed to load</h4>
+                <p>${error.message}</p>
+            </div>
+        `;
+    }
 }
 
 function initializeCategoryEvents() {
@@ -32,8 +48,6 @@ function initializeCategoryEvents() {
             customCategoryInput.value = "";
 
             updateSelectedCategoryText(selectedCategoryText);
-
-            console.log("Selected category:", selectedCategory);
         });
     });
 
@@ -48,8 +62,6 @@ function initializeCategoryEvents() {
         }
 
         updateSelectedCategoryText(selectedCategoryText);
-
-        console.log("Selected category:", selectedCategory);
     });
 }
 

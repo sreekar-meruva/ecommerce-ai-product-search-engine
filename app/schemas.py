@@ -43,4 +43,4 @@ class ProductResult(BaseModel):
 class SearchResponse(BaseModel):
     query: str
     total_results: int
-    result: List[ProductResult]
+    results: List[ProductResult]
