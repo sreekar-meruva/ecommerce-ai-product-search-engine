@@ -3,6 +3,8 @@ const queryInput = document.getElementById("queryInput");
 const resultsContainer = document.getElementById("resultsContainer");
 const sourceTiles = document.querySelectorAll(".source-tile");
 
+const API_URL = "http://127.0.0.1:8000/search";
+
 let selectedSources = [];
 
 sourceTiles.forEach((tile) => {
@@ -21,34 +23,73 @@ sourceTiles.forEach((tile) => {
     });
 });
 
-searchButton.addEventListener("click", function () {
+function buildSearchPayload() {
     const query = queryInput.value.trim();
 
-    if (!query) {
-        resultsContainer.innerHTML = `<p>Please enter a search query.</p>`;
-        return;
-    }
+    const selectedCategory =
+        typeof getSelectedCategory === "function"
+            ? getSelectedCategory()
+            : null;
+
+    return {
+        query: query,
+        category: selectedCategory,
+        sources: selectedSources,
+        min_price: null,
+        max_price: null,
+        min_rating: null,
+        top_k: 10
+    };
+}
+
+async function searchProducts() {
+    const payload = buildSearchPayload();
+
+    console.log("Search button clicked");
+    console.log("Sending payload:", payload);
 
     if (selectedSources.length === 0) {
-        resultsContainer.innerHTML = `<p>Please select at least one shopping site.</p>`;
+        showErrorState("Please select at least one shopping site.");
         return;
     }
 
-    resultsContainer.innerHTML = `
-        <div style="
-            background: rgba(255,255,255,0.14);
-            border: 1px solid rgba(255,255,255,0.20);
-            padding: 24px;
-            border-radius: 20px;
-            color: white;
-            backdrop-filter: blur(10px);
-        ">
-            <h4 style="margin-bottom: 12px;">Search Payload Preview</h4>
-            <p><strong>Query:</strong> ${query}</p>
-            <p><strong>Selected Sources:</strong> ${selectedSources.join(", ")}</p>
-        </div>
-    `;
+    if (!payload.query && !payload.category) {
+        showErrorState("Please enter a search query or select a category.");
+        return;
+    }
 
-    console.log("Query:", query);
-    console.log("Selected sources:", selectedSources);
+    showLoadingState();
+
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        console.log("API response:", data);
+        console.log(data.results);
+
+        if (!response.ok) {
+            throw new Error(data.detail || "API request failed.");
+        }
+
+        renderProductCards(data.results);
+
+    } catch (error) {
+        console.error("Search error:", error);
+        showErrorState(error.message);
+    }
+}
+
+searchButton.addEventListener("click", searchProducts);
+
+queryInput.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+        searchProducts();
+    }
 });

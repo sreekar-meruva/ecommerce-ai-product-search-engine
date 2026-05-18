@@ -42,7 +42,7 @@ def search_products(request: SearchRequest):
         return({
             "query": request.query,
             "total_results": len(results),
-            "result": results
+            "results": results
         })
     
     except Exception as e:

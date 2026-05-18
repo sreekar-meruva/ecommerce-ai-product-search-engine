@@ -1,0 +1,30 @@
+<div class="product-card">
+    <div class="product-image-wrapper">
+        <img class="product-image" src="{{image_url}}" alt="{{name}}">
+        <span class="source-badge">{{source}}</span>
+    </div>
+
+    <div class="product-content">
+        <div class="product-top-row">
+            <p class="product-brand">{{brand}} · {{category}}</p>
+            <p class="product-price">${{price}}</p>
+        </div>
+
+        <h4 class="product-title">{{name}}</h4>
+
+        <p class="product-description">{{description}}</p>
+
+        <div class="product-meta">
+            <span>⭐ {{rating}} ({{review_count}})</span>
+            <span>{{similarity_text}}</span>
+        </div>
+
+        <div class="product-footer">
+            <span>{{availability}}</span>
+
+            <a href="{{product_url}}" target="_blank" class="view-button">
+                View Product
+            </a>
+        </div>
+    </div>
+</div>
