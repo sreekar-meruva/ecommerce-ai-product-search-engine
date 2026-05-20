@@ -113,7 +113,7 @@ function showErrorState(message) {
 
     resultsContainer.innerHTML = `
         <div class="status-card error-card">
-            <h4>Something went wrong. Try again later.</h4>
+            <h4>Something went wrong</h4>
             <p>${message}</p>
         </div>
     `;
